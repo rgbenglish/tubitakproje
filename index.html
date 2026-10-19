@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cultural Exchange Project - Discover Turkey (A2 Level)</title>
+    <style>
+        /* Genel Stiller */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        h1 { margin: 0; font-size: 22px; color: #f1c40f; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+
+        .btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            transition: background 0.3s, transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover { background-color: #c0392b; }
+        .btn:active { transform: scale(0.95); }
+
+        /* Simge Haritası (Icon Board) */
+        #icon-board {
+            width: 95%;
+            max-width: 1200px;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* İl Kartı */
+        .province-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 5px 15px 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            position: relative;
+        }
+
+        .province-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            border-color: #f1c40f;
+        }
+
+        /* Türk Plakası Rozeti */
+        .plate-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: white;
+            color: black;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 900;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            border: 1px solid #ccc;
+        }
+
+        .plate-blue-strip {
+            background: #003399;
+            color: white;
+            padding: 2px 4px;
+            font-size: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .plate-number {
+            padding: 2px 6px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .province-icon {
+            font-size: 40px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .province-name {
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            word-wrap: break-word;
+            width: 100%;
+        }
+
+        /* Modal / Bilgi Ekranı Kapsayıcısı */
+        #modal-container {
+            display: none; 
+            width: 95%;
+            max-width: 850px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: #f8f9fa;
+            color: #333;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            box-sizing: border-box;
+        }
+
+        #modal-container::-webkit-scrollbar { width: 10px; }
+        #modal-container::-webkit-scrollbar-track { background: #e9ecef; border-radius: 10px; }
+        #modal-container::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 10px; }
+
+        /* Modal Başlığı */
+        #modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #dee2e6;
+            padding-bottom: 20px;
+        }
+
+        #modal-icon { font-size: 55px; }
+        
+        #modal-container h2 {
+            color: #212529;
+            font-size: 32px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .info-plate {
+            background: white;
+            color: black;
+            border: 2px solid #212529;
+            border-radius: 6px;
+            font-size: 22px;
+            font-weight: bold;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.2);
+        }
+        .info-plate .blue { background: #003399; color: white; padding: 5px 10px; font-size: 15px; display: flex; align-items: center;}
+        .info-plate .num { padding: 5px 15px; font-family: 'Courier New', Courier, monospace;}
+
+        /* Aşamalar (Steps) */
+        .step { display: none; } 
+        .step.active { display: block; } 
+
+        /* Aşama 1: Ön Sorular */
+        .pre-question-box {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #ffe69c;
+            margin-bottom: 15px;
+        }
+        .pre-question-box h3 { margin-top: 0; color: #856404; font-size: 18px; margin-bottom: 10px;}
+        .pre-question-text { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 15px;}
+        
+        .pre-options { list-style-type: none; padding: 0; margin: 0;}
+        .pre-options li {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+            font-weight: 500;
+            color: #495057;
+        }
+        .pre-options li:hover { background: #e9ecef; border-color: #adb5bd; }
+
+        /* Aşama 2: Bilgi Ekranı */
+        .info-section {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 16.5px;
+            line-height: 1.6;
+            color: #343a40;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .sec-history { background: #fff3e0; border-left: 6px solid #f57c00; }
+        .sec-food { background: #e8f5e9; border-left: 6px solid #43a047; }
+        .sec-tourist { background: #e3f2fd; border-left: 6px solid #1e88e5; }
+
+        .info-section strong { font-size: 18px; display: inline-block; margin-bottom: 8px; color: #212529;}
+
+        /* Aşama 3: Quiz */
+        .questions-title {
+            text-align: center;
+            font-size: 24px;
+            color: #212529;
+            margin-top: 10px;
+            margin-bottom: 25px;
+            border-bottom: 3px dashed #adb5bd;
+            padding-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .question-box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .question-box h3 { 
+            margin-top: 0; 
+            color: #0d6efd; 
+            font-size: 18px; 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .question-text {
+            font-weight: 600;
+            font-size: 17px;
+            margin-bottom: 15px;
+            color: #495057;
+        }
+        
+        .options { list-style-type: none; padding: 0; margin: 0;}
+        .options li {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+            font-weight: 500;
+            color: #495057;
+        }
+        .options li:hover { background: #e9ecef; border-color: #adb5bd; }
+
+        /* Aksiyon Butonları */
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        #btn-show-info { background: #0d6efd; color: white; display: none; }
+        #btn-show-info:hover { background: #0b5ed7; }
+        
+        #btn-start-quiz { background: #198754; color: white; }
+        #btn-start-quiz:hover { background: #157347; }
+        
+        #btn-back-map { background: #343a40; color: white; margin-top: 20px; }
+
+        /* Tam Ekran Butonu */
+        #fullscreen-btn {
+            position: absolute;
+            bottom: 25px;
+            right: 25px;
+            z-index: 50;
+            background: #0d6efd;
+        }
+        #fullscreen-btn:hover { background: #0b5ed7; }
+        
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Cultural Exchange Project 🇹🇷 (A2)</h1>
+        <button id="back-btn" class="btn" style="display: none;" onclick="backToMap()">⬅ Back to Map</button>
+    </header>
+
+    <div id="icon-board"></div>
+
+    <!-- MODAL -->
+    <div id="modal-container">
+        <!-- Ortak Başlık -->
+        <div id="modal-header">
+            <span id="modal-icon">📍</span>
+            <h2>
+                <span id="city-name">City Name</span>
+                <span class="info-plate">
+                    <span class="blue">TR</span>
+                    <span class="num" id="info-plate-num">00</span>
+                </span>
+            </h2>
+        </div>
+        
+        <!-- AŞAMA 1: Ön Sorular (3 Adet) -->
+        <div id="step-pre-question" class="step active">
+            <div id="pre-questions-container">
+                <!-- 3 Soru JS ile doldurulacak -->
+            </div>
+            <button class="btn action-btn" id="btn-show-info" onclick="goToStep('information')">📖 Read Information</button>
+        </div>
+
+        <!-- AŞAMA 2: Bilgi Ekranı -->
+        <div id="step-information" class="step">
+            <div class="info-section sec-history">
+                <strong>🏛️ History:</strong><br>
+                <span id="city-history">...</span>
+            </div>
+            <div class="info-section sec-food">
+                <strong>🍽️ Food:</strong><br>
+                <span id="city-food">...</span>
+            </div>
+            <div class="info-section sec-tourist">
+                <strong>🗺️ Tourist Places:</strong><br>
+                <span id="city-tourist">...</span>
+            </div>
+            
+            <button class="btn action-btn" id="btn-start-quiz" onclick="goToStep('quiz')">📝 I'm Ready for the Test!</button>
+        </div>
+
+        <!-- AŞAMA 3: Quiz -->
+        <div id="step-quiz" class="step">
+            <div class="questions-title">📝 Quiz Time</div>
+            <div id="questions-container"></div>
+            <button class="btn action-btn" id="btn-back-map" onclick="backToMap()">⬅ Back to Map</button>
+        </div>
+
+    </div>
+
+    <button class="btn" id="fullscreen-btn" onclick="toggleFullScreen()">⛶ Full Screen</button>
+
+    <script>
+        // 20 Özel İl İçin A2 Seviyesinde İçerikler (Her biri 3 Ön Soru İçerir)
+        const specialCities = [
+            { 
+                plate: "01", name: "Adana", icon: "🍢", 
+                preQuestions: [
+                    { q: "What is Adana famous for?", o: ["A) Its kebab", "B) Its snow", "C) Its penguins"], a: 0 },
+                    { q: "What is the name of the old bridge in Adana?", o: ["A) Taşköprü", "B) Golden Gate", "C) London Bridge"], a: 0 },
+                    { q: "Is Adana kebab spicy?", o: ["A) Yes, a little", "B) No, it is sweet", "C) It has no taste"], a: 0 }
+                ],
+                history: "Adana is a very old city. The Romans lived here a long time ago. They built a big stone bridge called Taşköprü. People still use this bridge today.",
+                food: "Adana is famous for its kebab. It is a little spicy. People make it with meat and cook it on a fire. You can eat it with bread and vegetables.",
+                tourist: "You can visit the old Stone Bridge and the big Ulu Mosque. You can also walk near the Seyhan River and enjoy the sunny weather.",
+                questions: [
+                    { topic: "History", q: "Who built the Stone Bridge in Adana?", o: ["A) The Romans", "B) The Egyptians", "C) The Chinese"], a: 0 },
+                    { topic: "Food", q: "What is Adana Kebab like?", o: ["A) It is sweet", "B) It is a little spicy", "C) It is cold"], a: 1 },
+                    { topic: "Tourist", q: "Where can you walk in Adana?", o: ["A) Near the sea", "B) Near the Seyhan River", "C) In the forest"], a: 1 }
+                ]
+            },
+            { 
+                plate: "06", name: "Ankara", icon: "🏛️", 
+                preQuestions: [
+                    { q: "What is the capital of Turkey?", o: ["A) Istanbul", "B) Izmir", "C) Ankara"], a: 2 },
+                    { q: "Who is buried in Anitkabir?", o: ["A) Atatürk", "B) Mevlana", "C) Napoleon"], a: 0 },
+                    { q: "What food is famous in Ankara?", o: ["A) Ankara Tava", "B) Pizza", "C) Sushi"], a: 0 }
+                ],
+                history: "Ankara is the capital city of Turkey. Atatürk started the War of Independence here. It is a very important city for Turkish people.",
+                food: "You can eat 'Ankara Tava' here. It is meat and rice. It is very delicious. People also drink a lot of tea in Ankara.",
+                tourist: "You must visit Anitkabir. It is the tomb of Atatürk. You can also go to the old Ankara Castle and see the beautiful city from the top.",
+                questions: [
+                    { topic: "History", q: "What is Ankara?", o: ["A) A small village", "B) The capital city", "C) A big forest"], a: 1 },
+                    { topic: "Food", q: "What is Ankara Tava made of?", o: ["A) Meat and rice", "B) Fish and bread", "C) Only vegetables"], a: 0 },
+                    { topic: "Tourist", q: "What is Anitkabir?", o: ["A) A big park", "B) Atatürk's tomb", "C) A shopping mall"], a: 1 }
+                ]
+            },
+            { 
+                plate: "07", name: "Antalya", icon: "🏖️", 
+                preQuestions: [
+                    { q: "Why do people visit Antalya?", o: ["A) For skiing", "B) For the sea and beaches", "C) For the desert"], a: 1 },
+                    { q: "What is the old city in Antalya called?", o: ["A) Kaleiçi", "B) Konyaaltı", "C) Lara"], a: 0 },
+                    { q: "Is the fish in Antalya fresh?", o: ["A) Yes, it is near the sea", "B) No, it comes from a farm", "C) It is frozen"], a: 0 }
+                ],
+                history: "Antalya is a very old city. Many years ago, Romans and Ottomans lived here. You can see old houses in a place called Kaleiçi.",
+                food: "Antalya is near the sea, so the fish is very fresh. People also eat a cold bean salad called 'Piyaz'. The oranges here are very sweet.",
+                tourist: "Antalya has beautiful beaches. You can swim in the sea. You can also visit the old Hadrian's Gate and see the big Düden Waterfall.",
+                questions: [
+                    { topic: "History", q: "What is the old city in Antalya called?", o: ["A) Kaleiçi", "B) Konyaaltı", "C) Lara"], a: 0 },
+                    { topic: "Food", q: "Why is the fish fresh in Antalya?", o: ["A) Because it is near the sea", "B) Because it comes from a farm", "C) Because it is frozen"], a: 0 },
+                    { topic: "Tourist", q: "What can you do at the beach in Antalya?", o: ["A) Swim in the sea", "B) Ski on the snow", "C) Ride a camel"], a: 0 }
+                ]
+            },
+            { 
+                plate: "16", name: "Bursa", icon: "🍑", 
+                preQuestions: [
+                    { q: "What is Bursa famous for?", o: ["A) İskender Kebab", "B) Pizza", "C) Sushi"], a: 0 },
+                    { q: "What was Bursa in the past?", o: ["A) A Roman city", "B) The first Ottoman capital", "C) A Greek island"], a: 1 },
+                    { q: "What sweet food can you eat in Bursa?", o: ["A) Candied chestnuts", "B) Chocolate", "C) Ice cream"], a: 0 }
+                ],
+                history: "Bursa was the first big capital of the Ottoman Empire. It is very old. There are many beautiful old mosques and tombs in the city.",
+                food: "Bursa is famous for İskender Kebab. It has meat, bread, tomato sauce, and yogurt. It is very tasty. You can also eat sweet chestnuts here.",
+                tourist: "You can visit the Grand Mosque (Ulu Cami). You can also go up to Uludağ Mountain. In winter, you can ski there.",
+                questions: [
+                    { topic: "History", q: "What was Bursa in the past?", o: ["A) A Roman city", "B) The first Ottoman capital", "C) A Greek island"], a: 1 },
+                    { topic: "Food", q: "What is a famous sweet food in Bursa?", o: ["A) Candied chestnuts", "B) Chocolate", "C) Ice cream"], a: 0 },
+                    { topic: "Tourist", q: "What can you do on Uludağ Mountain in winter?", o: ["A) Swim", "B) Ski", "C) Surf"], a: 1 }
+                ]
+            },
+            { 
+                plate: "17", name: "Canakkale", icon: "🐴", 
+                preQuestions: [
+                    { q: "What is the famous story of Çanakkale?", o: ["A) The Trojan War", "B) Harry Potter", "C) The Lion King"], a: 0 },
+                    { q: "What can you see in the old city of Troy?", o: ["A) A big wooden horse", "B) A big castle", "C) A tall tower"], a: 0 },
+                    { q: "What food is popular in Çanakkale?", o: ["A) Fresh fish", "B) Sushi", "C) Tacos"], a: 0 }
+                ],
+                history: "Çanakkale is famous for an old story about a wooden horse. The story is called the Trojan War. There is a big wooden horse in the city today.",
+                food: "You can eat fresh fish here because it is near the sea. Meatballs (köfte) are also very popular in Çanakkale.",
+                tourist: "You can visit the old city of Troy and see the wooden horse. You can also see the big memorial for the soldiers from World War I.",
+                questions: [
+                    { topic: "History", q: "What famous story is about Çanakkale?", o: ["A) The Trojan War", "B) The Civil War", "C) The Space War"], a: 0 },
+                    { topic: "Food", q: "What can you eat in Çanakkale?", o: ["A) Fresh fish", "B) Sushi", "C) Tacos"], a: 0 },
+                    { topic: "Tourist", q: "What can you see in the old city of Troy?", o: ["A) A big wooden horse", "B) A big castle", "C) A tall tower"], a: 0 }
+                ]
+            },
+            { 
+                plate: "27", name: "Gaziantep", icon: "🥮", 
+                preQuestions: [
+                    { q: "What is the most famous dessert in Gaziantep?", o: ["A) Baklava", "B) Ice cream", "C) Chocolate cake"], a: 0 },
+                    { q: "Does Gaziantep have an old castle?", o: ["A) Yes, it does", "B) No, it does not", "C) It has a volcano"], a: 0 },
+                    { q: "What can you see in the Zeugma Museum?", o: ["A) The Gypsy Girl mosaic", "B) The Mona Lisa", "C) The Statue of Liberty"], a: 0 }
+                ],
+                history: "Gaziantep is one of the oldest cities in the world. It has a very big and old castle. People have lived here for thousands of years.",
+                food: "This city is the best place for food! You must eat Baklava. It is very sweet and has nuts. People also love to eat spicy Lahmacun here.",
+                tourist: "You can visit the Zeugma Mosaic Museum. You can see a very famous picture called the 'Gypsy Girl' there. It is very beautiful.",
+                questions: [
+                    { topic: "History", q: "What does Gaziantep have?", o: ["A) An old castle", "B) A big volcano", "C) A desert"], a: 0 },
+                    { topic: "Food", q: "What is Gaziantep famous for?", o: ["A) Baklava", "B) Hamburgers", "C) Sushi"], a: 0 },
+                    { topic: "Tourist", q: "What can you see in the Zeugma Museum?", o: ["A) The Gypsy Girl mosaic", "B) The Mona Lisa", "C) The Statue of Liberty"], a: 0 }
+                ]
+            },
+            { 
+                plate: "31", name: "Hatay", icon: "🥙", 
+                preQuestions: [
+                    { q: "What is the famous dessert from Hatay?", o: ["A) Künefe", "B) Tiramisu", "C) Donut"], a: 0 },
+                    { q: "What is special about Hatay's history?", o: ["A) Different religions lived together", "B) It was a space station", "C) It was a desert"], a: 0 },
+                    { q: "Where can you go in Hatay?", o: ["A) The waterfalls", "B) The North Pole", "C) The Moon"], a: 0 }
+                ],
+                history: "Hatay is a very old city. It was an important place for Christians a long time ago. People from different religions have lived here together for many years.",
+                food: "Hatay is famous for its delicious food. You must try Künefe. It is a hot dessert with cheese and sugar. It is very sweet and yummy.",
+                tourist: "You can visit the St. Pierre Church. It is very old. You can also go to the Harbiye Waterfalls and enjoy the green nature.",
+                questions: [
+                    { topic: "History", q: "What is special about Hatay's history?", o: ["A) Different religions lived together", "B) It was a space station", "C) It was a desert"], a: 0 },
+                    { topic: "Food", q: "What is the famous dessert in Hatay?", o: ["A) Künefe", "B) Cake", "C) Donut"], a: 0 },
+                    { topic: "Tourist", q: "Where can you go in Hatay?", o: ["A) The waterfalls", "B) The North Pole", "C) The Moon"], a: 0 }
+                ]
+            },
+            { 
+                plate: "34", name: "Istanbul", icon: "🕌", 
+                preQuestions: [
+                    { q: "What is the most famous mosque in Istanbul?", o: ["A) Hagia Sophia", "B) Blue Mosque", "C) Both A and B"], a: 2 },
+                    { q: "What can you do on the Bosphorus?", o: ["A) Take a boat trip", "B) Ski", "C) Ride a camel"], a: 0 },
+                    { q: "What is a popular food in Istanbul?", o: ["A) Simit", "B) Pizza", "C) Sushi"], a: 0 }
+                ],
+                history: "Istanbul is a very big and old city. It is in Europe and Asia. It was the capital of three big empires. You can see old walls and palaces here.",
+                food: "You can eat 'Simit' and fresh fish. People drink a lot of Turkish tea here. You can also try Turkish coffee.",
+                tourist: "You must visit Hagia Sophia and the Blue Mosque. You can also take a boat trip on the Bosphorus and see the beautiful houses.",
+                questions: [
+                    { topic: "History", q: "Where is Istanbul?", o: ["A) Only in Europe", "B) In Europe and Asia", "C) In Africa"], a: 1 },
+                    { topic: "Food", q: "What is a popular food in Istanbul?", o: ["A) Simit", "B) Pizza", "C) Sushi"], a: 0 },
+                    { topic: "Tourist", q: "What can you do on the Bosphorus?", o: ["A) Take a boat trip", "B) Ski", "C) Ride a camel"], a: 0 }
+                ]
+            },
+            { 
+                plate: "35", name: "Izmir", icon: "🕰️", 
+                preQuestions: [
+                    { q: "What is the symbol of Izmir?", o: ["A) The Clock Tower", "B) The Eiffel Tower", "C) The Pyramids"], a: 0 },
+                    { q: "What is a famous breakfast food in Izmir?", o: ["A) Boyoz", "B) Croissant", "C) Pancake"], a: 0 },
+                    { q: "What was the old name of Izmir?", o: ["A) Smyrna", "B) Rome", "C) Paris"], a: 0 }
+                ],
+                history: "Izmir is a very old city near the sea. A long time ago, it was called Smyrna. It was an important city for trade.",
+                food: "You can eat 'Boyoz' for breakfast. It is a special pastry. You must also try 'Kumru', a delicious sandwich with cheese and sausage.",
+                tourist: "You must see the Clock Tower in Konak Square. It is the symbol of the city. You can also walk near the sea and enjoy the fresh air.",
+                questions: [
+                    { topic: "History", q: "What was the old name of Izmir?", o: ["A) Smyrna", "B) Rome", "C) Paris"], a: 0 },
+                    { topic: "Food", q: "What is a famous breakfast food in Izmir?", o: ["A) Boyoz", "B) Croissant", "C) Pancake"], a: 0 },
+                    { topic: "Tourist", q: "What is the symbol of Izmir?", o: ["A) The Clock Tower", "B) The Big Ben", "C) The Statue of Liberty"], a: 0 }
+                ]
+            },
+            { 
+                plate: "42", name: "Konya", icon: "🌀", 
+                preQuestions: [
+                    { q: "Who lived in Konya?", o: ["A) Mevlana", "B) Napoleon", "C) Cleopatra"], a: 0 },
+                    { q: "What is Etli Ekmek?", o: ["A) Long bread with meat", "B) A sweet cake", "C) A soup"], a: 0 },
+                    { q: "What can you visit in Konya?", o: ["A) The Mevlana Museum", "B) The Pyramids", "C) The Great Wall"], a: 0 }
+                ],
+                history: "Konya is a very old city. It was the capital of the Seljuk Empire. Mevlana lived here. He was a famous poet and teacher.",
+                food: "You must eat 'Etli Ekmek' in Konya. It is a long bread with meat on top. It is very delicious. People also eat 'Fırın Kebab'.",
+                tourist: "You can visit the Mevlana Museum. It is a very important place. You can also see the Whirling Dervishes. They dance beautifully.",
+                questions: [
+                    { topic: "History", q: "Who was Mevlana?", o: ["A) A famous poet and teacher", "B) A football player", "C) A scientist"], a: 0 },
+                    { topic: "Food", q: "What is Etli Ekmek?", o: ["A) Long bread with meat", "B) A sweet cake", "C) A soup"], a: 0 },
+                    { topic: "Tourist", q: "What can you visit in Konya?", o: ["A) The Mevlana Museum", "B) The Pyramids", "C) The Great Wall"], a: 0 }
+                ]
+            },
+            { 
+                plate: "47", name: "Mardin", icon: "🏛️", 
+                preQuestions: [
+                    { q: "What are the houses in Mardin made of?", o: ["A) Stone", "B) Wood", "C) Ice"], a: 0 },
+                    { q: "What is Kaburga Dolması?", o: ["A) Meat with rice", "B) A sweet", "C) A drink"], a: 0 },
+                    { q: "What can you see from Mardin?", o: ["A) The Mesopotamian plain", "B) The ocean", "C) The North Pole"], a: 0 }
+                ],
+                history: "Mardin is a very old city in the south. It has beautiful houses made of stone. It looks like a city from a fairy tale.",
+                food: "You can eat 'Kaburga Dolması' here. It is meat with rice, cooked together. It is very tasty. People also eat a pastry called 'Sembusek'.",
+                tourist: "You can walk in the old city and take beautiful photos. You can also see the Mesopotamian plain from the top of the city.",
+                questions: [
+                    { topic: "History", q: "What are the houses in Mardin made of?", o: ["A) Wood", "B) Stone", "C) Ice"], a: 1 },
+                    { topic: "Food", q: "What is Kaburga Dolması?", o: ["A) Meat with rice", "B) A sweet", "C) A drink"], a: 0 },
+                    { topic: "Tourist", q: "What can you see from Mardin?", o: ["A) The Mesopotamian plain", "B) The ocean", "C) The North Pole"], a: 0 }
+                ]
+            },
+            { 
+                plate: "48", name: "Mugla", icon: "⛵", 
+                preQuestions: [
+                    { q: "Which famous beach is in Muğla?", o: ["A) Iztuzu Beach", "B) Bondi Beach", "C) Copacabana"], a: 0 },
+                    { q: "What food is popular in Muğla?", o: ["A) Seafood and olive oil", "B) Deep-fried food", "C) Spicy kebabs"], a: 0 },
+                    { q: "Which famous towns are in Muğla?", o: ["A) Bodrum and Marmaris", "B) Paris and London", "C) Rome and Milan"], a: 0 }
+                ],
+                history: "Muğla is in the west, near the sea. It has many old cities. People come here for holidays. Bodrum and Marmaris are in Muğla.",
+                food: "You can eat a lot of seafood here. Olive oil dishes are also very popular. You can try fresh vegetables and local honey.",
+                tourist: "You can swim in the beautiful blue sea. You can also visit Iztuzu Beach. It is famous for sea turtles. They lay their eggs here.",
+                questions: [
+                    { topic: "History", q: "Which famous towns are in Muğla?", o: ["A) Bodrum and Marmaris", "B) Paris and London", "C) Rome and Milan"], a: 0 },
+                    { topic: "Food", q: "What food is popular in Muğla?", o: ["A) Seafood and olive oil", "B) Deep-fried food", "C) Spicy kebabs"], a: 0 },
+                    { topic: "Tourist", q: "Which beach in Muğla is famous for sea turtles?", o: ["A) Iztuzu Beach", "B) Konyaaltı Beach", "C) Lara Beach"], a: 0 }
+                ]
+            },
+            { 
+                plate: "50", name: "Nevsehir", icon: "🎈", 
+                preQuestions: [
+                    { q: "What can you ride in Nevşehir?", o: ["A) A hot air balloon", "B) A train", "C) A ship"], a: 0 },
+                    { q: "What is Testi Kebabı?", o: ["A) Meat cooked in a clay pot", "B) Pizza", "C) Sushi"], a: 0 },
+                    { q: "Where did people live in Nevşehir in the past?", o: ["A) In trees", "B) In underground cities", "C) In ships"], a: 1 }
+                ],
+                history: "Nevşehir is in the Cappadocia region. It has very special rocks. A long time ago, people lived in underground cities here to hide.",
+                food: "You must eat 'Testi Kebabı' in Nevşehir. It is meat cooked in a clay pot. They break the pot to eat the food. It is fun and delicious.",
+                tourist: "You must see the Fairy Chimneys. You can also ride a hot air balloon. It is very exciting. You can see the beautiful valleys from the sky.",
+                questions: [
+                    { topic: "History", q: "Where did people live in Nevşehir in the past?", o: ["A) In trees", "B) In underground cities", "C) In ships"], a: 1 },
+                    { topic: "Food", q: "What is Testi Kebabı?", o: ["A) Meat cooked in a clay pot", "B) Pizza", "C) Sushi"], a: 0 },
+                    { topic: "Tourist", q: "What can you ride in Nevşehir?", o: ["A) A hot air balloon", "B) A train", "C) A ship"], a: 0 }
+                ]
+            },
+            { 
+                plate: "53", name: "Rize", icon: "🍵", 
+                preQuestions: [
+                    { q: "What does Rize produce?", o: ["A) Tea", "B) Coffee", "C) Bananas"], a: 0 },
+                    { q: "What is Muhlama?", o: ["A) A hot dish with cheese", "B) A cold soup", "C) A sweet cake"], a: 0 },
+                    { q: "Where can you go in Rize?", o: ["A) Ayder Plateau", "B) The Sahara Desert", "C) The Moon"], a: 0 }
+                ],
+                history: "Rize is in the north of Turkey. It rains a lot here. So, it is very green. People have grown tea here for many years.",
+                food: "You must drink Turkish tea here. Rize is the tea capital of Turkey. You can also eat 'Muhlama', a hot dish with cheese and cornmeal.",
+                tourist: "You can visit the Ayder Plateau. It is high in the mountains. It is very green and beautiful. You can also see waterfalls.",
+                questions: [
+                    { topic: "History", q: "What is the most famous plant in Rize?", o: ["A) Tea", "B) Coffee", "C) Oranges"], a: 0 },
+                    { topic: "Food", q: "What is Muhlama?", o: ["A) A hot dish with cheese", "B) A cold soup", "C) A sweet cake"], a: 0 },
+                    { topic: "Tourist", q: "Where can you go in Rize?", o: ["A) Ayder Plateau", "B) The Sahara Desert", "C) The Moon"], a: 0 }
+                ]
+            },
+            { 
+                plate: "61", name: "Trabzon", icon: "🏔️", 
+                preQuestions: [
+                    { q: "What is the famous fish in Trabzon?", o: ["A) Hamsi", "B) Salmon", "C) Shark"], a: 0 },
+                    { q: "Where is the Sumela Monastery?", o: ["A) On a high mountain", "B) On a beach", "C) In a city center"], a: 0 },
+                    { q: "What can you eat with bread in Trabzon?", o: ["A) Kuymak", "B) Pizza", "C) Sushi"], a: 0 }
+                ],
+                history: "Trabzon is an old city near the Black Sea. It was an important city for trade many years ago. The Sumela Monastery is very old and famous.",
+                food: "You can eat 'Hamsi' here. It is a small fish from the Black Sea. People cook it in many ways. You can also eat 'Kuymak' with bread.",
+                tourist: "You must visit the Sumela Monastery. It is on a high mountain. You can also go to Uzungöl Lake. It is very peaceful and beautiful.",
+                questions: [
+                    { topic: "History", q: "Where is Trabzon?", o: ["A) Near the Black Sea", "B) Near the Mediterranean", "C) In the desert"], a: 0 },
+                    { topic: "Food", q: "What is the famous fish in Trabzon?", o: ["A) Hamsi", "B) Salmon", "C) Shark"], a: 0 },
+                    { topic: "Tourist", q: "Where is the Sumela Monastery?", o: ["A) On a high mountain", "B) On a beach", "C) In a city center"], a: 0 }
+                ]
+            },
+            { 
+                plate: "63", name: "Sanliurfa", icon: "🐟", 
+                preQuestions: [
+                    { q: "What is the sacred pool in Şanlıurfa called?", o: ["A) Balıklıgöl", "B) Lake Van", "C) The Dead Sea"], a: 0 },
+                    { q: "What is a famous local food in Şanlıurfa?", o: ["A) Urfa Kebab", "B) Pizza", "C) Sushi"], a: 0 },
+                    { q: "What is Şanlıurfa called?", o: ["A) The City of Prophets", "B) The City of Cats", "C) The City of Snow"], a: 0 }
+                ],
+                history: "Şanlıurfa is a very old city. It is called the 'City of Prophets'. People believe the Prophet Abraham was born here. You can see very old ruins nearby.",
+                food: "You can eat 'Urfa Kebab' here. It is not very spicy. It is very delicious. You must also try 'Çiğ Köfte', a special local food.",
+                tourist: "You must see Balıklıgöl. It is a big pool with sacred fish. You can also visit Göbekli Tepe. It is one of the oldest temples in the world.",
+                questions: [
+                    { topic: "History", q: "What is Şanlıurfa called?", o: ["A) The City of Prophets", "B) The City of Cats", "C) The City of Snow"], a: 0 },
+                    { topic: "Food", q: "What is a famous local food in Şanlıurfa?", o: ["A) Urfa Kebab", "B) Pizza", "C) Sushi"], a: 0 },
+                    { topic: "Tourist", q: "What is Balıklıgöl?", o: ["A) A pool with sacred fish", "B) A big mountain", "C) A museum"], a: 0 }
+                ]
+            },
+            { 
+                plate: "65", name: "Van", icon: "🐈", 
+                preQuestions: [
+                    { q: "What animal is famous in Van?", o: ["A) A cat", "B) A dog", "C) A bird"], a: 0 },
+                    { q: "What is Van famous for?", o: ["A) A big breakfast", "B) Fast food", "C) Only coffee"], a: 0 },
+                    { q: "Which ancient people lived in Van?", o: ["A) The Urartians", "B) The Romans", "C) The Vikings"], a: 0 }
+                ],
+                history: "Van is an old city in the east. It is next to a very big lake. A long time ago, the Urartians lived here. You can see their old castle.",
+                food: "Van is famous for its breakfast. It has many small dishes, cheese, and olives. You must try the 'Van Otlu Peynir' (herbed cheese).",
+                tourist: "You can visit Akdamar Island and see the old church. You can also see the famous Van cats. They have different colored eyes.",
+                questions: [
+                    { topic: "History", q: "Which ancient people lived in Van?", o: ["A) The Urartians", "B) The Romans", "C) The Vikings"], a: 0 },
+                    { topic: "Food", q: "What is Van famous for?", o: ["A) A big breakfast", "B) Fast food", "C) Only coffee"], a: 0 },
+                    { topic: "Tourist", q: "What animal is famous in Van?", o: ["A) A cat", "B) A dog", "C) A bird"], a: 0 }
+                ]
+            },
+            { 
+                plate: "38", name: "Kayseri", icon: "🥟", 
+                preQuestions: [
+                    { q: "What is a famous dumpling dish from Kayseri?", o: ["A) Mantı", "B) Ravioli", "C) Tortellini"], a: 0 },
+                    { q: "What does Kayseri have in the city center?", o: ["A) A big castle", "B) A beach", "C) A volcano"], a: 0 },
+                    { q: "What can you do on Mount Erciyes in winter?", o: ["A) Ski", "B) Swim", "C) Surf"], a: 0 }
+                ],
+                history: "Kayseri is a very old city. It was an important city for Romans and Ottomans. It has a big and old castle in the city center.",
+                food: "Kayseri is famous for 'Mantı'. It is a small dumpling with meat. You eat it with yogurt and butter. It is very delicious.",
+                tourist: "You can visit Mount Erciyes. In winter, you can ski there. You can also see the old bazaars and mosques in the city.",
+                questions: [
+                    { topic: "History", q: "What does Kayseri have in the city center?", o: ["A) A big castle", "B) A beach", "C) A volcano"], a: 0 },
+                    { topic: "Food", q: "What is Mantı?", o: ["A) A small dumpling with meat", "B) A pizza", "C) A soup"], a: 0 },
+                    { topic: "Tourist", q: "What can you do on Mount Erciyes in winter?", o: ["A) Ski", "B) Swim", "C) Surf"], a: 0 }
+                ]
+            },
+            { 
+                plate: "25", name: "Erzurum", icon: "⛷️", 
+                preQuestions: [
+                    { q: "What sport is popular in Erzurum?", o: ["A) Skiing", "B) Surfing", "C) Golf"], a: 0 },
+                    { q: "What is Cağ Kebabı?", o: ["A) Meat cooked on a big stick", "B) A sweet cake", "C) A cold drink"], a: 0 },
+                    { q: "What happened in Erzurum in 1919?", o: ["A) An important meeting", "B) A big earthquake", "C) A football match"], a: 0 }
+                ],
+                history: "Erzurum is a very old city in the east. It is very cold in winter. In 1919, an important meeting for the Turkish War of Independence happened here.",
+                food: "You must eat 'Cağ Kebabı' in Erzurum. It is meat cooked on a big stick. You can also try 'Kadayıf Dolması', a sweet pastry.",
+                tourist: "You can visit the old Erzurum Castle. You can also go to Palandöken Mountain. It is one of the best places for skiing in Turkey.",
+                questions: [
+                    { topic: "History", q: "What happened in Erzurum in 1919?", o: ["A) An important meeting", "B) A big earthquake", "C) A football match"], a: 0 },
+                    { topic: "Food", q: "What is Cağ Kebabı?", o: ["A) Meat cooked on a big stick", "B) A sweet cake", "C) A cold drink"], a: 0 },
+                    { topic: "Tourist", q: "What can you do on Palandöken Mountain?", o: ["A) Ski", "B) Swim", "C) Fish"], a: 0 }
+                ]
+            },
+            { 
+                plate: "22", name: "Edirne", icon: "🤼", 
+                preQuestions: [
+                    { q: "What famous sport event happens in Edirne?", o: ["A) Oil Wrestling", "B) Football", "C) Basketball"], a: 0 },
+                    { q: "Which famous mosque is in Edirne?", o: ["A) Selimiye Mosque", "B) Blue Mosque", "C) Hagia Sophia"], a: 0 },
+                    { q: "What is a famous dish in Edirne?", o: ["A) Fried liver (Ciğer)", "B) Pizza", "C) Sushi"], a: 0 }
+                ],
+                history: "Edirne was the capital of the Ottoman Empire before Istanbul. It has a very famous mosque called Selimiye. It is very big and beautiful.",
+                food: "Edirne is famous for 'Ciğer'. It is fried liver. It is very tasty. You can also eat 'Badem Ezmesi', a sweet almond paste.",
+                tourist: "You must see the Selimiye Mosque. It is a masterpiece. You can also watch the Kırkpınar Oil Wrestling. It is a very old Turkish sport.",
+                questions: [
+                    { topic: "History", q: "What was Edirne in the past?", o: ["A) A capital city", "B) A small village", "C) A desert"], a: 0 },
+                    { topic: "Food", q: "What is a famous dish in Edirne?", o: ["A) Fried liver (Ciğer)", "B) Pizza", "C) Sushi"], a: 0 },
+                    { topic: "Tourist", q: "Which famous mosque is in Edirne?", o: ["A) Selimiye Mosque", "B) Blue Mosque", "C) Hagia Sophia"], a: 0 }
+                ]
+            }
+        ];
+
+        // Diğer İller İçin Dinamik A2 İçerik Üretici (3 Ön Soru)
+        function createDynamicData(city) {
+            return {
+                preQuestions: [
+                    { q: `Is ${city.name} in Turkey?`, o: ["A) Yes, it is", "B) No, it is in France", "C) No, it is in Italy"], a: 0 },
+                    { q: `Does ${city.name} have a long history?`, o: ["A) Yes, it does", "B) No, it is a new city", "C) It is in space"], a: 0 },
+                    { q: `Can you eat traditional food in ${city.name}?`, o: ["A) Yes, you can", "B) No, you cannot", "C) Only fast food"], a: 0 }
+                ],
+                history: `${city.name} is an old city in Turkey. Many different people lived here in the past. You can see old buildings and learn about its history.`,
+                food: `The food in ${city.name} is very delicious. People use fresh vegetables and local products. You can eat traditional dishes and try local desserts.`,
+                tourist: `${city.name} has beautiful places to visit. You can see nature, old buildings, and local markets. People here are very friendly.`,
+                questions: [
+                    { topic: "History", q: `Is ${city.name} an old city?`, o: ["A) Yes, it is.", "B) No, it is a new city.", "C) It is in another country."], a: 0 },
+                    { topic: "Food", q: `What can you eat in ${city.name}?`, o: ["A) Local food", "B) Only fast food", "C) Nothing"], a: 0 },
+                    { topic: "Tourist", q: `Can you visit historical buildings in ${city.name}?`, o: ["A) Yes, you can.", "B) No, you cannot.", "C) Only at night."], a: 0 }
+                ]
+            };
+        }
+
+        // 81 İlin Temel Listesi
+        const allProvincesBase = [
+            { plate: "02", name: "Adiyaman", icon: "⛰️" }, { plate: "03", name: "Afyon", icon: "🥓" }, { plate: "04", name: "Agri", icon: "🗻" },
+            { plate: "05", name: "Amasya", icon: "🍎" }, { plate: "08", name: "Artvin", icon: "🌲" }, { plate: "09", name: "Aydin", icon: "🫒" },
+            { plate: "10", name: "Balikesir", icon: "🫒" }, { plate: "11", name: "Bilecik", icon: "🏺" }, { plate: "12", name: "Bingol", icon: "🏔️" },
+            { plate: "13", name: "Bitlis", icon: "❄️" }, { plate: "14", name: "Bolu", icon: "🌲" }, { plate: "15", name: "Burdur", icon: "🐟" },
+            { plate: "18", name: "Cankiri", icon: "🌾" }, { plate: "19", name: "Corum", icon: "🏺" }, { plate: "20", name: "Denizli", icon: "🐓" },
+            { plate: "21", name: "Diyarbakir", icon: "🍉" }, { plate: "23", name: "Elazig", icon: "🍇" }, { plate: "24", name: "Erzincan", icon: "🧀" },
+            { plate: "26", name: "Eskisehir", icon: "🛶" }, { plate: "28", name: "Giresun", icon: "🌰" }, { plate: "29", name: "Gumushane", icon: "🍎" },
+            { plate: "30", name: "Hakkari", icon: "🏔️" }, { plate: "32", name: "Isparta", icon: "🌹" }, { plate: "33", name: "Mersin", icon: "🍋" },
+            { plate: "36", name: "Kars", icon: "🧀" }, { plate: "37", name: "Kastamonu", icon: "🌾" }, { plate: "39", name: "Kirklareli", icon: "🧀" },
+            { plate: "40", name: "Kirsehir", icon: "🎻" }, { plate: "41", name: "Kocaeli", icon: "🏗️" }, { plate: "43", name: "Kutahya", icon: "🍽️" },
+            { plate: "44", name: "Malatya", icon: "🍑" }, { plate: "45", name: "Manisa", icon: "🍇" }, { plate: "46", name: "Kahramanmaras", icon: "🍦" },
+            { plate: "49", name: "Mus", icon: "🌷" }, { plate: "51", name: "Nigde", icon: "🍎" }, { plate: "52", name: "Ordu", icon: "🌰" },
+            { plate: "54", name: "Sakarya", icon: "🚜" }, { plate: "55", name: "Samsun", icon: "🚬" }, { plate: "56", name: "Siirt", icon: "🥜" },
+            { plate: "57", name: "Sinop", icon: "🌊" }, { plate: "58", name: "Sivas", icon: "🐑" }, { plate: "59", name: "Tekirdag", icon: "🍇" },
+            { plate: "60", name: "Tokat", icon: "🍇" }, { plate: "62", name: "Tunceli", icon: "🦅" }, { plate: "64", name: "Usak", icon: "🧶" },
+            { plate: "66", name: "Yozgat", icon: "🌾" }, { plate: "67", name: "Zonguldak", icon: "⛏️" }, { plate: "68", name: "Aksaray", icon: "🏜️" },
+            { plate: "69", name: "Bayburt", icon: "🏰" }, { plate: "70", name: "Karaman", icon: "🍏" }, { plate: "71", name: "Kirikkale", icon: "🏭" },
+            { plate: "72", name: "Batman", icon: "🛢️" }, { plate: "73", name: "Sirnak", icon: "⛰️" }, { plate: "74", name: "Bartin", icon: "🌳" },
+            { plate: "75", name: "Ardahan", icon: "🐄" }, { plate: "76", name: "Igdir", icon: "🚢" }, { plate: "77", name: "Yalova", icon: "🌺" },
+            { plate: "78", name: "Karabuk", icon: "🏭" }, { plate: "79", name: "Kilis", icon: "🌶️" }, { plate: "80", name: "Osmaniye", icon: "🥜" },
+            { plate: "81", name: "Duzce", icon: "🌰" }
+        ];
+
+        let finalCitiesData = [...specialCities];
+
+        allProvincesBase.forEach(prov => {
+            if (!finalCitiesData.find(c => c.name === prov.name)) {
+                const dynamicData = createDynamicData(prov);
+                finalCitiesData.push({
+                    plate: prov.plate, name: prov.name, icon: prov.icon,
+                    preQuestions: dynamicData.preQuestions,
+                    history: dynamicData.history, food: dynamicData.food, tourist: dynamicData.tourist,
+                    questions: dynamicData.questions
+                });
+            }
+        });
+
+        finalCitiesData.sort((a, b) => parseInt(a.plate) - parseInt(b.plate));
+
+        const iconBoard = document.getElementById('icon-board');
+        const modalContainer = document.getElementById('modal-container');
+        const backBtn = document.getElementById('back-btn');
+
+        // Arayüzü Oluştur
+        function buildBoard() {
+            finalCitiesData.forEach(city => {
+                const card = document.createElement('div');
+                card.className = 'province-card';
+                card.onclick = () => openCityModal(city);
+                
+                card.innerHTML = `
+                    <div class="plate-badge">
+                        <div class="plate-blue-strip">TR</div>
+                        <div class="plate-number">${city.plate}</div>
+                    </div>
+                    <div class="province-icon">${city.icon}</div>
+                    <div class="province-name">${city.name}</div>
+                `;
+                iconBoard.appendChild(card);
+            });
+        }
+
+        let currentCity = null;
+        let answeredPreQuestions = 0;
+
+        // Modali Aç ve İlk Adımı (Ön Sorular) Başlat
+        function openCityModal(city) {
+            currentCity = city;
+            answeredPreQuestions = 0; // Sayacı sıfırla
+            
+            // Başlık Bilgileri
+            document.getElementById('city-name').innerText = city.name;
+            document.getElementById('info-plate-num').innerText = city.plate;
+            document.getElementById('modal-icon').innerText = city.icon;
+            
+            // Aşamaları sıfırla
+            goToStep('pre-question');
+
+            // Ön Soruları Doldur
+            const preQuestionsContainer = document.getElementById('pre-questions-container');
+            preQuestionsContainer.innerHTML = '';
+            
+            city.preQuestions.forEach((pq, pqIndex) => {
+                const qBox = document.createElement('div');
+                qBox.className = 'pre-question-box';
+                
+                let optionsHTML = '';
+                pq.o.forEach((option, oIndex) => {
+                    optionsHTML += `<li onclick="checkPreAnswer(this, ${oIndex}, ${pq.a}, ${pqIndex})">${option}</li>`;
+                });
+
+                qBox.innerHTML = `
+                    <h3>🤔 Question ${pqIndex + 1}</h3>
+                    <div class="pre-question-text">${pq.q}</div>
+                    <ul class="pre-options" id="pre-options-${pqIndex}">
+                        ${optionsHTML}
+                    </ul>
+                `;
+                preQuestionsContainer.appendChild(qBox);
+            });
+
+            // "Bilgiyi Gör" butonunu gizle
+            document.getElementById('btn-show-info').style.display = 'none';
+
+            // Ekranı Değiştir
+            iconBoard.style.display = 'none';
+            modalContainer.style.display = 'block';
+            backBtn.style.display = 'block';
+            modalContainer.scrollTop = 0;
+        }
+
+        // Ön Soru Cevap Kontrolü
+        function checkPreAnswer(element, selected, correct, qIndex) {
+            // Sadece tıklanan sorunun seçeneklerini kontrol et
+            const questionOptions = document.querySelectorAll(`#pre-options-${qIndex} li`);
+            
+            // Eğer bu soru daha önce cevaplandıysa tekrar sayma
+            if (element.classList.contains('answered')) return;
+
+            questionOptions.forEach(opt => {
+                opt.style.backgroundColor = 'white';
+                opt.style.borderColor = '#ced4da';
+                opt.innerText = opt.innerText.replace(" ✅", "").replace(" ❌", "");
+            });
+
+            if (selected === correct) {
+                element.style.backgroundColor = '#d4edda';
+                element.style.borderColor = '#28a745';
+                element.innerText += " ✅ Correct!";
+            } else {
+                element.style.backgroundColor = '#f8d7da';
+                element.style.borderColor = '#dc3545';
+                element.innerText += " ❌ Not quite!";
+            }
+
+            // Bu soruyu cevaplandı olarak işaretle
+            element.classList.add('answered');
+            
+            // Sadece doğru cevaplananları değil, herhangi bir cevap verilenleri say
+            // Aynı soruya tekrar tıklanmasını engellemek için bir kontrol yapalım
+            // (Yukarıda element.classList.contains('answered') ile yaptık ama bu sadece tıklanan element için)
+            // Daha güvenli yol: Her sorunun cevaplanıp cevaplanmadığını ayrı takip etmek.
+            // Şimdilik basitçe, her tıklamada buton kontrolü yapalım.
+            // Ancak aynı soruya birden fazla tıklanırsa sayaç artmasın.
+            // Bunun için her soru kutusuna bir 'data-answered' ekleyebiliriz veya global bir dizi kullanabiliriz.
+            // En temizi: Her soru için bir flag.
+            
+            // Bu fonksiyon her tıklandığında çalıştığı için, sadece ilk tıklamada sayacı artırmalıyız.
+            // Elementin parent'ı olan qBox'a bir özellik ekleyelim.
+            const qBox = element.closest('.pre-question-box');
+            if (!qBox.dataset.answered) {
+                qBox.dataset.answered = "true";
+                answeredPreQuestions++;
+            }
+
+            // 3 soru da cevaplandıysa butonu göster
+            if (answeredPreQuestions === 3) {
+                document.getElementById('btn-show-info').style.display = 'block';
+            }
+        }
+
+        // Adımlar Arası Geçiş
+        function goToStep(stepName) {
+            document.getElementById('step-pre-question').classList.remove('active');
+            document.getElementById('step-information').classList.remove('active');
+            document.getElementById('step-quiz').classList.remove('active');
+
+            document.getElementById(`step-${stepName}`).classList.add('active');
+            modalContainer.scrollTop = 0;
+
+            if (stepName === 'information' && currentCity) {
+                document.getElementById('city-history').innerText = currentCity.history;
+                document.getElementById('city-food').innerText = currentCity.food;
+                document.getElementById('city-tourist').innerText = currentCity.tourist;
+            }
+
+            if (stepName === 'quiz' && currentCity) {
+                renderQuiz(currentCity);
+            }
+        }
+
+        // Quiz Sorularını Oluştur
+        function renderQuiz(city) {
+            const questionsContainer = document.getElementById('questions-container');
+            questionsContainer.innerHTML = ''; 
+            
+            city.questions.forEach((qData, qIndex) => {
+                const qBox = document.createElement('div');
+                qBox.className = 'question-box';
+                
+                let qIcon = "❓";
+                if(qData.topic === "History") qIcon = "🏛️";
+                if(qData.topic === "Food") qIcon = "🍽️";
+                if(qData.topic === "Tourist") qIcon = "🗺️";
+
+                let optionsHTML = '';
+                qData.o.forEach((option, oIndex) => {
+                    optionsHTML += `<li onclick="checkQuizAnswer(this, ${oIndex}, ${qData.a}, ${qIndex})">${option}</li>`;
+                });
+
+                qBox.innerHTML = `
+                    <h3>${qIcon} ${qData.topic} Quiz</h3>
+                    <div class="question-text">${qData.q}</div>
+                    <ul class="options" id="options-${qIndex}">
+                        ${optionsHTML}
+                    </ul>
+                `;
+                questionsContainer.appendChild(qBox);
+            });
+        }
+
+        // Quiz Cevap Kontrolü
+        function checkQuizAnswer(element, selected, correct, qIndex) {
+            const questionOptions = document.querySelectorAll(`#options-${qIndex} li`);
+            questionOptions.forEach(opt => {
+                opt.style.backgroundColor = '#f8f9fa'; 
+                opt.style.borderColor = '#ced4da';
+                opt.innerText = opt.innerText.replace(" ✅", "").replace(" ❌", "");
+            });
+
+            if (selected === correct) {
+                element.style.backgroundColor = '#d4edda';
+                element.style.borderColor = '#28a745';
+                element.innerText += " ✅ Correct!";
+            } else {
+                element.style.backgroundColor = '#f8d7da';
+                element.style.borderColor = '#dc3545';
+                element.innerText += " ❌ Try again!";
+            }
+        }
+
+        // Haritaya Geri Dön
+        function backToMap() {
+            iconBoard.style.display = 'grid';
+            modalContainer.style.display = 'none';
+            backBtn.style.display = 'none';
+            currentCity = null;
+            answeredPreQuestions = 0;
+        }
+
+        // Tam Ekran
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Başlat
+        buildBoard();
+    </script>
+</body>
+</html>
